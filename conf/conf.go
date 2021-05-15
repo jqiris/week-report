@@ -23,7 +23,6 @@ func InitConf(filename string) error {
 		logger.Error("decode json error: %v", err)
 		return err
 	}
-	logger.Warnf("the conf is:%+v", config)
 	return nil
 }
 
