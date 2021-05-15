@@ -1,0 +1,16 @@
+{
+    "user": "jqiris",
+    "project": {
+        "周报项目": [
+            "D:\\project\\week-report"
+        ]
+    },
+    "output": {
+        "title": "上周",
+        "dir": "report",
+        "filter": [
+            "test",
+            "Merge"
+        ]
+    }
+}
