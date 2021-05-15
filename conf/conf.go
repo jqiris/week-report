@@ -15,12 +15,12 @@ var (
 func InitConf(filename string) error {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		logger.Error("read file: %v error:%v", filename, err)
+		logger.Errorf("read file: %v error:%v", filename, err)
 		return err
 	}
 	err = json.Unmarshal(content, config)
 	if err != nil {
-		logger.Error("decode json error: %v", err)
+		logger.Errorf("decode json error: %v", err)
 		return err
 	}
 	return nil
