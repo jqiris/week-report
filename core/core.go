@@ -38,58 +38,60 @@ func Before(c *cli.Context) error {
 	return nil
 }
 
-//日报产出
+//Report 日报产出
 func Report(c *cli.Context) error {
-	s, e, n := c.Timestamp("sdate"), c.Timestamp("edate"), time.Now()
+	s, e := c.Timestamp("sdate"), c.Timestamp("edate")
 	if s == nil {
+		n := time.Now().AddDate(0, 0, -4)
 		s = &n
 	}
 	if e == nil {
+		n := time.Now()
 		e = &n
 	}
 	sb, ee := utils.TimeToDayBegin(s), utils.TimeToDayEnd(e)
-	sdate, edate := sb.Format("2006-01-02 15:04:05"), ee.Format("2006-01-02 15:04:05")
-	osdate, oedate := sb.Format("20060102"), ee.Format("20060102")
-	logger.Info("week-report:", osdate, "==>", oedate)
+	sDate, eDate := sb.Format("2006-01-02 15:04:05"), ee.Format("2006-01-02 15:04:05")
+	osDate, oeDate := sb.Format("20060102"), ee.Format("20060102")
+	logger.Info("week-report:", osDate, "==>", oeDate)
 	//获取当前路径
-	cdir, err := os.Getwd()
+	cDir, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 	//分析日志
 	result := make(map[string][]string)
 	projects := conf.GetProjectConf()
-	for pname, pdirs := range projects {
-		logger.Info("开始分析日志, 项目:" + pname)
-		for _, pdir := range pdirs {
-			res, err := analyse(cdir, pdir, pname, sdate, edate)
+	for pName, pDirs := range projects {
+		logger.Info("开始分析日志, 项目:" + pName)
+		for _, pDir := range pDirs {
+			res, err := analyse(cDir, pDir, pName, sDate, eDate)
 			if err != nil {
 				return err
 			}
 			if len(res) > 0 {
-				result[pname] = append(result[pname], res...)
+				result[pName] = append(result[pName], res...)
 			}
 		}
-		logger.Info("结束分析日志, 项目:" + pname)
+		logger.Info("结束分析日志, 项目:" + pName)
 	}
 	//去重并且过滤关键字
 	for k, v := range result {
 		result[k] = filters.Filtering(v)
 	}
 	//输出到目录
-	ocfg := conf.GetOutputConf()
-	return output(ocfg.Title, ocfg.Dir, osdate, oedate, result)
+	oCfg := conf.GetOutputConf()
+	return output(oCfg.Title, oCfg.Dir, osDate, oeDate, result)
 }
 
 //analyse 解析日报信息
-func analyse(cdir, pdir, name, sdate, edate string) ([]string, error) {
-	err := os.Chdir(pdir)
+func analyse(cDir, pDir, name, sDate, eDate string) ([]string, error) {
+	err := os.Chdir(pDir)
 	if err != nil {
 		return nil, err
 	}
-	logcmd := cmd.NewCmd("git", "log", "--author="+conf.GetUserConf(), "--pretty=format:%s", "--after="+sdate, "--before="+edate)
-	s := <-logcmd.Start()
-	err = os.Chdir(cdir)
+	logCmd := cmd.NewCmd("git", "log", "--author="+conf.GetUserConf(), "--pretty=format:%s", "--after="+sDate, "--before="+eDate)
+	s := <-logCmd.Start()
+	err = os.Chdir(cDir)
 	if err != nil {
 		return nil, err
 	}
@@ -97,9 +99,9 @@ func analyse(cdir, pdir, name, sdate, edate string) ([]string, error) {
 }
 
 //output 输出到目录文件
-func output(title, dir, sdate, edate string, result map[string][]string) error {
+func output(title, dir, sDate, eDate string, result map[string][]string) error {
 	//开始写入结果
-	filename := "week_" + sdate + "_" + edate + ".txt"
+	filename := "week_" + sDate + "_" + eDate + ".txt"
 	filepath := path.Join(dir, filename)
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0644)
 	if err != nil {
@@ -110,9 +112,9 @@ func output(title, dir, sdate, edate string, result map[string][]string) error {
 		file.Write([]byte(title + ":\n"))
 	}
 	num := 1
-	for pname, plist := range result {
+	for pName, plist := range result {
 		for _, item := range plist {
-			vw := fmt.Sprintf("%d-%s-%s\n", num, pname, item)
+			vw := fmt.Sprintf("%d-%s-%s\n", num, pName, item)
 			file.Write([]byte(vw))
 			num += 1
 		}

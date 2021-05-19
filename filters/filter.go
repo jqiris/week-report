@@ -16,7 +16,7 @@ func init() {
 	filterQueue = append(filterQueue, NewKeysFilter())
 }
 
-//过滤服务
+//Filtering 过滤服务
 func Filtering(list []string) (ret []string) {
 	if len(filterQueue) == 0 {
 		return list
