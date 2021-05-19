@@ -64,7 +64,7 @@ GLOBAL OPTIONS:
 ### 执行周报生成命令
 
 - 标准：week-report run ,根据配置文件信息自动生成周报，默认开始时间5天前，结束时间当前时间
-- 指定配置文件：week-report -c=xxx.json run ,xxx.json配置文件路径
+- 指定配置文件：week-report -c="xxx.json" run ,xxx.json配置文件路径
 - 指定开始日期或者结束日期 week-report -s=20210518 -e=20210519 run 日期可选，不设置默认开始时间5天前，结束时间当天
 
 
